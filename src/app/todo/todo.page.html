@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar color="tertiary">
+    <ion-title>Todo</ion-title>
+    <ion-buttons slot="end">
+      <ion-button size="small" slot="icon-only" (click)="logout()">
+        <ion-icon name="log-out"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-item>
+    <ion-button shape="round" fill="outline" size="small" (click)="clearFilter()">
+      <em><small>Clear</small></em>
+    </ion-button>
+    <ion-buttons slot="end">
+      <ion-button size="small" slot="icon-only" (click)="filterActionSheet()">
+        <ion-icon name="funnel"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-item>
+
+  <ion-card (click)="todoActionSheet()">
+    <ion-card-content>
+      <p>
+        <ion-icon color="primary" name="refresh"></ion-icon> Todo Title
+      </p>
+      <ion-badge color="primary"><small>Pending</small></ion-badge>
+      <small float-right>12/12/2009</small>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card (click)="todoActionSheet()">
+    <ion-card-content>
+      <p>
+        <ion-icon color="success" name="done-all"></ion-icon> Todo Title
+      </p>
+      <ion-badge color="success"><small>Complete</small></ion-badge>
+      <small float-right>12/12/2009</small>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="tertiary" size="small" (click)="gotoAddTodo()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

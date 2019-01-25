@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="tertiary">
     <ion-title>Todo</ion-title>
-    <ion-buttons slot="end">
+    <ion-buttons slot="end" *ngIf="auth.user$ | async as user">
       <ion-button size="small" slot="icon-only" (click)="logout()">
         <ion-icon name="log-out"></ion-icon>
       </ion-button>
@@ -22,30 +22,43 @@
     </ion-buttons>
   </ion-item>
 
-  <ion-card (click)="todoActionSheet()">
-    <ion-card-content>
-      <p>
-        <ion-icon color="primary" name="refresh"></ion-icon> Todo Title
-      </p>
-      <ion-badge color="primary"><small>Pending</small></ion-badge>
-      <small float-right>12/12/2009</small>
-    </ion-card-content>
-  </ion-card>
+  <ng-container *ngIf="infinite | async as todos">
 
-  <ion-card (click)="todoActionSheet()">
-    <ion-card-content>
-      <p>
-        <ion-icon color="success" name="done-all"></ion-icon> Todo Title
-      </p>
-      <ion-badge color="success"><small>Complete</small></ion-badge>
-      <small float-right>12/12/2009</small>
-    </ion-card-content>
-  </ion-card>
+    <cdk-virtual-scroll-viewport itemSize="100" (scrolledIndexChange)="nextBatch($event, (todos[todos.length - 1].title))">
+        
+      <ion-card *cdkVirtualFor="let todo of todos; let i = index; trackBy: trackByIdx" (click)="todoActionSheet(todo.tid)">
+        <ion-card-content>
+          <p>
+            <ion-icon [color]="todo.complete ? 'success' : 'primary'" [name]="todo.complete ? 'done-all' : 'refresh'"></ion-icon>
+            {{todo.title}}
+          </p>
+          <ion-badge [color]="todo.complete ? 'success' : 'primary'">
+            <small *ngIf="!todo.complete">Pending</small>
+            <small *ngIf="todo.complete">Complete</small>
+          </ion-badge>
+          <small float-right>12/12/2009</small>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngIf="theEnd">
+        <ion-card-content>
+          <p><strong text-center>END</strong></p>
+        </ion-card-content>
+      </ion-card>
+
+    </cdk-virtual-scroll-viewport>
+
+  </ng-container>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button color="tertiary" size="small" (click)="gotoAddTodo()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
+  <!-- <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll> -->
 
 </ion-content>

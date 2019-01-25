@@ -7,19 +7,17 @@
   </ion-toolbar>
 </ion-header>
 
-
-
 <ion-content padding>
 
-  <form>
+  <form [formGroup]="addForm">
 
     <ion-item>
       <ion-label position="floating">Todo</ion-label>
-      <ion-textarea rows="7"></ion-textarea>
+      <ion-textarea rows="7" formControlName="title"></ion-textarea>
     </ion-item>
 
     <div padding>
-      <ion-button color="tertiary" expand="block" shape="round" size="small">Confirm</ion-button>
+      <ion-button [disabled]="addForm.invalid" color="tertiary" expand="block" shape="round" size="small" (click)="addtodo()">Confirm</ion-button>
     </div>
 
   </form>

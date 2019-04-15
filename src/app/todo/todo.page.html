@@ -12,7 +12,7 @@
 <ion-content>
 
   <ion-item>
-    <ion-button shape="round" fill="outline" size="small" (click)="clearFilter()">
+    <ion-button *ngIf="filter" shape="round" fill="outline" size="small" (click)="clearFilter()">
       <em><small>Clear</small></em>
     </ion-button>
     <ion-buttons slot="end">
@@ -22,10 +22,20 @@
     </ion-buttons>
   </ion-item>
 
+  <ion-item *ngIf="!infinite">
+
+    <ion-card>
+      <ion-card-content>
+        <p><strong text-center>LOADING...</strong></p>
+      </ion-card-content>
+    </ion-card>
+
+  </ion-item>
+
   <ng-container *ngIf="infinite | async as todos">
 
     <cdk-virtual-scroll-viewport itemSize="100" (scrolledIndexChange)="nextBatch($event, (todos[todos.length - 1].title))">
-        
+
       <ion-card *cdkVirtualFor="let todo of todos; let i = index; trackBy: trackByIdx" (click)="todoActionSheet(todo.tid)">
         <ion-card-content>
           <p>

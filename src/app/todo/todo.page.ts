@@ -19,7 +19,6 @@ import { tap, map, throttleTime, mergeMap, scan } from 'rxjs/operators';
   styleUrls: ['./todo.page.scss']
 })
 export class TodoPage implements OnDestroy {
-  // us: Subscription; // User auth subscription
   _us: Subscription;
 
   uid: string;
@@ -32,6 +31,7 @@ export class TodoPage implements OnDestroy {
 
   offset = new BehaviorSubject(null);
   infinite: Observable<any[]>;
+  filter = false;
 
   constructor(
     private afs: AngularFirestore,
@@ -57,7 +57,6 @@ export class TodoPage implements OnDestroy {
   }
 
   ngOnDestroy() {
-    // if (this.us) { this.us.unsubscribe(); }
     if (this._us) {
       this._us.unsubscribe();
     }
@@ -138,14 +137,34 @@ export class TodoPage implements OnDestroy {
           text: 'Complete Todos',
           icon: 'done-all',
           handler: () => {
-            console.log('Complete filter');
+            this.filter = true;
+            this.infinite = undefined;
+            this.offset = new BehaviorSubject(null);
+            const batchMap = this.offset.pipe(
+              throttleTime(500),
+              mergeMap(n => this.getFilterBatch(n, this.uid, true)),
+              scan((acc, batch) => {
+                return { ...acc, ...batch };
+              }, {})
+            );
+            this.infinite = batchMap.pipe(map(v => Object.values(v)));
           }
         },
         {
           text: 'Pending Todos',
           icon: 'refresh',
           handler: () => {
-            console.log('Pending filter');
+            this.filter = true;
+            this.infinite = undefined;
+            this.offset = new BehaviorSubject(null);
+            const batchMap = this.offset.pipe(
+              throttleTime(500),
+              mergeMap(n => this.getFilterBatch(n, this.uid, false)),
+              scan((acc, batch) => {
+                return { ...acc, ...batch };
+              }, {})
+            );
+            this.infinite = batchMap.pipe(map(v => Object.values(v)));
           }
         }
       ]
@@ -154,7 +173,17 @@ export class TodoPage implements OnDestroy {
   }
 
   clearFilter() {
-    console.log('Clear Filter');
+    this.filter = false;
+    this.infinite = undefined;
+    this.offset = new BehaviorSubject(null);
+    const batchMap = this.offset.pipe(
+      throttleTime(500),
+      mergeMap(n => this.getBatch(n, this.uid)),
+      scan((acc, batch) => {
+        return { ...acc, ...batch };
+      }, {})
+    );
+    this.infinite = batchMap.pipe(map(v => Object.values(v)));
   }
 
   async logout() {
@@ -200,9 +229,32 @@ export class TodoPage implements OnDestroy {
     return this.afs
       .collection(`users/${userid}/todos`, ref =>
         ref
-          .orderBy('title', 'desc')
+          .orderBy('title')
           .startAfter(offset)
           .limit(this.batch)
+      )
+      .snapshotChanges()
+      .pipe(
+        tap(arr => (arr.length ? null : (this.theEnd = true))),
+        map(arr => {
+          return arr.reduce((acc, cur) => {
+            const id = cur.payload.doc.id;
+            const data = cur.payload.doc.data();
+            data['tid'] = id;
+            return { ...acc, [id]: data };
+          }, {});
+        })
+      );
+  }
+
+  getFilterBatch(offset: any, userid: string, filter: boolean) {
+    return this.afs
+      .collection(`users/${userid}/todos`, ref =>
+        ref
+          .orderBy('title')
+          .startAfter(offset)
+          .limit(this.batch)
+          .where('complete', '==', filter)
       )
       .snapshotChanges()
       .pipe(

@@ -9,7 +9,6 @@ import {
 } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
-import { async } from 'q';
 
 @Component({
   selector: 'app-addtodo',

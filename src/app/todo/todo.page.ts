@@ -66,7 +66,7 @@ export class TodoPage implements OnDestroy {
     }
   }
 
-  async todoActionSheet(todoid: string) {
+  async todoActionSheet(todoId: string, todoTitle: string) {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Todo Actions',
       buttons: [
@@ -74,7 +74,7 @@ export class TodoPage implements OnDestroy {
           text: 'Complete',
           icon: 'done-all',
           handler: async () => {
-            await this.ts.updatestate(this.uid, todoid, true);
+            await this.ts.updatestate(this.uid, todoId, true);
             return this.presentToast('Todo Completed');
           }
         },
@@ -82,7 +82,7 @@ export class TodoPage implements OnDestroy {
           text: 'Pending',
           icon: 'refresh',
           handler: async () => {
-            await this.ts.updatestate(this.uid, todoid, false);
+            await this.ts.updatestate(this.uid, todoId, false);
             return this.presentToast('Todo Pending');
           }
         },
@@ -90,7 +90,7 @@ export class TodoPage implements OnDestroy {
           text: 'Update',
           icon: 'create',
           handler: () => {
-            this.router.navigateByUrl('todo/update');
+            this.todoUpdate(todoId, todoTitle);
           }
         },
         {
@@ -98,12 +98,47 @@ export class TodoPage implements OnDestroy {
           role: 'destructive',
           icon: 'trash',
           handler: () => {
-            this.confirmDelete(todoid);
+            this.confirmDelete(todoId);
           }
         }
       ]
     });
     await actionSheet.present();
+  }
+
+  async todoUpdate(todoId: string, todoTitle: string) {
+    const alert = await this.alertController.create({
+      header: 'Update Todo',
+      inputs: [
+        {
+          name: 'todo',
+          type: 'text',
+          value: todoTitle,
+          placeholder: 'Todo'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => { }
+        }, {
+          text: 'Update',
+          handler: async data => {
+            if (data.todo === undefined || data.todo === '') {
+              this.presentToast('Cannot update an Empty Todo');
+              return;
+            }
+            if (data.todo === todoTitle) { return; }
+            await this.ts.update(this.uid, todoId, data.todo);
+            return this.presentToast('Todo Updated');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   async todoAdd() {

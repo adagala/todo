@@ -6,17 +6,12 @@ import { Routes, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 import { TodoPage } from './todo.page';
-import { UpdatetodoComponent } from './updatetodo/updatetodo.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
 const routes: Routes = [
   {
     path: '',
     component: TodoPage
-  },
-  {
-    path: 'update',
-    component: UpdatetodoComponent
   }
 ];
 
@@ -29,6 +24,6 @@ const routes: Routes = [
     ScrollingModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [TodoPage, UpdatetodoComponent]
+  declarations: [TodoPage]
 })
 export class TodoPageModule {}

@@ -119,6 +119,7 @@ export class TodoPage implements OnDestroy {
         {
           text: 'Delete',
           handler: async () => {
+            await this.hideTodo(todoid);
             await this.ts.delete(this.uid, todoid);
             return this.presentToast('Todo Deleted');
           }
@@ -127,6 +128,10 @@ export class TodoPage implements OnDestroy {
     });
 
     await alert.present();
+  }
+
+  hideTodo(todoid: string) {
+    return document.getElementById(todoid).style.display = 'none';
   }
 
   async filterActionSheet() {

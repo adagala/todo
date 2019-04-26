@@ -36,7 +36,7 @@
 
     <cdk-virtual-scroll-viewport itemSize="100" (scrolledIndexChange)="nextBatch($event, (todos[todos.length - 1].title))">
 
-      <ion-card *cdkVirtualFor="let todo of todos; let i = index; trackBy: trackByIdx" (click)="todoActionSheet(todo.tid)">
+      <ion-card *cdkVirtualFor="let todo of todos; let i = index; trackBy: trackByIdx" (click)="todoActionSheet(todo.tid)" [id]="todo.tid">
         <ion-card-content>
           <p>
             <ion-icon [color]="todo.complete ? 'success' : 'primary'" [name]="todo.complete ? 'done-all' : 'refresh'"></ion-icon>

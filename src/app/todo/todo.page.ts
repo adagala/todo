@@ -66,7 +66,7 @@ export class TodoPage implements OnDestroy {
     }
   }
 
-  async todoActionSheet(todoId: string, todoTitle: string) {
+  async todoActionSheet(todoId: string, todoTitle: string, todoState: boolean) {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Todo Actions',
       buttons: [
@@ -74,7 +74,11 @@ export class TodoPage implements OnDestroy {
           text: 'Complete',
           icon: 'done-all',
           handler: async () => {
+            if (todoState === true) { return; }
             await this.ts.updatestate(this.uid, todoId, true);
+            if (this.filter === true) {
+              await this.hideTodoOnChange(todoId);
+            }
             return this.presentToast('Todo Completed');
           }
         },
@@ -82,7 +86,11 @@ export class TodoPage implements OnDestroy {
           text: 'Pending',
           icon: 'refresh',
           handler: async () => {
+            if (todoState === false) { return; }
             await this.ts.updatestate(this.uid, todoId, false);
+            if (this.filter === true) {
+              await this.hideTodoOnChange(todoId);
+            }
             return this.presentToast('Todo Pending');
           }
         },
@@ -189,7 +197,7 @@ export class TodoPage implements OnDestroy {
         {
           text: 'Delete',
           handler: async () => {
-            await this.hideTodoOnDelete(todoid);
+            await this.hideTodoOnChange(todoid);
             await this.ts.delete(this.uid, todoid);
             return this.presentToast('Todo Deleted');
           }
@@ -200,7 +208,7 @@ export class TodoPage implements OnDestroy {
     await alert.present();
   }
 
-  hideTodoOnDelete(todoid: string) {
+  hideTodoOnChange(todoid: string) {
     return document.getElementById(todoid).style.display = 'none';
   }
 
@@ -315,14 +323,14 @@ export class TodoPage implements OnDestroy {
       );
   }
 
-  getFilterBatch(offset: any, userid: string, filter: boolean) {
+  getFilterBatch(offset: any, userid: string, todoState: boolean) {
     return this.afs
       .collection(`users/${userid}/todos`, ref =>
         ref
           .orderBy('title')
           .startAfter(offset)
           .limit(this.batch)
-          .where('complete', '==', filter)
+          .where('complete', '==', todoState)
       )
       .snapshotChanges()
       .pipe(

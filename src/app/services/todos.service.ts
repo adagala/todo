@@ -4,25 +4,28 @@ import {
   AngularFirestoreDocument,
   AngularFirestoreCollection
 } from '@angular/fire/firestore';
+import * as firebase from 'firebase';
 
-interface IUser {
+interface Todo {
   title: string;
   complete: boolean;
+  timestamp: any;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodosService {
-  userdoc: AngularFirestoreDocument<IUser>;
-  usercol: AngularFirestoreCollection<IUser>;
+  userdoc: AngularFirestoreDocument<Todo>;
+  usercol: AngularFirestoreCollection<Todo>;
 
-  constructor(private afs: AngularFirestore) {}
+  constructor(private afs: AngularFirestore) { }
 
   // add a new todo
   add(userid: string, title: string) {
-    this.usercol = this.afs.collection<IUser>(`users/${userid}/todos`);
-    return this.usercol.add({ title: title, complete: false });
+    const now = firebase.firestore.Timestamp.now();
+    this.usercol = this.afs.collection<Todo>(`users/${userid}/todos`);
+    return this.usercol.add({ title: title, complete: false, timestamp: now });
   }
 
   // delete a todo

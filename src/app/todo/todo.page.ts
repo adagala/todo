@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import {
   ActionSheetController,
   AlertController,
@@ -7,11 +7,10 @@ import {
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { PaginationService } from '../services/pagination.service';
-import { Subscription, BehaviorSubject, Observable } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { TodosService } from '../services/todos.service';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { tap, map, throttleTime, mergeMap, scan } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-todo',
@@ -22,16 +21,7 @@ export class TodoPage implements OnDestroy {
   _us: Subscription;
 
   uid: string;
-
-  @ViewChild(CdkVirtualScrollViewport)
-  viewport: CdkVirtualScrollViewport;
-
-  batch = 20;
-  theEnd = false;
-
-  offset = new BehaviorSubject(null);
-  infinite: Observable<any[]>;
-  filter = false;
+  todos: Observable<any>;
 
   constructor(
     private afs: AngularFirestore,
@@ -45,19 +35,19 @@ export class TodoPage implements OnDestroy {
   ) {
     this._us = this.auth.user$.subscribe(user => {
       this.uid = user.uid;
-      this.initialBatch(user.uid);
+      this.todos = this.afs
+        .collection<any>(`users/${user.uid}/todos`, ref => ref.orderBy('timestamp', 'desc'))
+        .snapshotChanges()
+        .pipe(
+          map(actions => {
+            return actions.map(a => {
+              const data = a.payload.doc.data();
+              const tid = a.payload.doc.id;
+              return { tid, ...data };
+            });
+          })
+        );
     });
-  }
-
-  initialBatch(userid: string) {
-    const batchMap = this.offset.pipe(
-      throttleTime(500),
-      mergeMap(n => this.getBatch(n, userid)),
-      scan((acc, batch) => {
-        return { ...acc, ...batch };
-      }, {})
-    );
-    this.infinite = batchMap.pipe(map(v => Object.values(v)));
   }
 
   ngOnDestroy() {
@@ -66,34 +56,10 @@ export class TodoPage implements OnDestroy {
     }
   }
 
-  async todoActionSheet(todoId: string, todoTitle: string, todoState: boolean) {
+  async todoActionSheet(todoId: string, todoTitle: string) {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Todo Actions',
       buttons: [
-        {
-          text: 'Complete',
-          icon: 'done-all',
-          handler: async () => {
-            if (todoState === true) { return; }
-            await this.ts.updatestate(this.uid, todoId, true);
-            if (this.filter === true) {
-              await this.hideTodoOnChange(todoId);
-            }
-            return this.presentToast('Todo Completed');
-          }
-        },
-        {
-          text: 'Pending',
-          icon: 'refresh',
-          handler: async () => {
-            if (todoState === false) { return; }
-            await this.ts.updatestate(this.uid, todoId, false);
-            if (this.filter === true) {
-              await this.hideTodoOnChange(todoId);
-            }
-            return this.presentToast('Todo Pending');
-          }
-        },
         {
           text: 'Update',
           icon: 'create',
@@ -167,15 +133,12 @@ export class TodoPage implements OnDestroy {
           handler: () => { }
         }, {
           text: 'Ok',
-          handler: async data => {
+          handler: data => {
             if (data.todo === undefined || data.todo === '') {
               this.presentToast('Cannot add an Empty Todo');
               return;
             }
-            this.infinite = undefined;
-            this.offset = new BehaviorSubject(null);
-            await this.ts.add(this.uid, data.todo);
-            return this.initialBatch(this.uid);
+            this.ts.add(this.uid, data.todo);
           }
         }
       ]
@@ -197,7 +160,6 @@ export class TodoPage implements OnDestroy {
         {
           text: 'Delete',
           handler: async () => {
-            await this.hideTodoOnChange(todoid);
             await this.ts.delete(this.uid, todoid);
             return this.presentToast('Todo Deleted');
           }
@@ -206,60 +168,6 @@ export class TodoPage implements OnDestroy {
     });
 
     await alert.present();
-  }
-
-  hideTodoOnChange(todoid: string) {
-    return document.getElementById(todoid).style.display = 'none';
-  }
-
-  async filterActionSheet() {
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'View Options',
-      buttons: [
-        {
-          text: 'Complete Todos',
-          icon: 'done-all',
-          handler: () => {
-            this.filter = true;
-            this.infinite = undefined;
-            this.offset = new BehaviorSubject(null);
-            const batchMap = this.offset.pipe(
-              throttleTime(500),
-              mergeMap(n => this.getFilterBatch(n, this.uid, true)),
-              scan((acc, batch) => {
-                return { ...acc, ...batch };
-              }, {})
-            );
-            this.infinite = batchMap.pipe(map(v => Object.values(v)));
-          }
-        },
-        {
-          text: 'Pending Todos',
-          icon: 'refresh',
-          handler: () => {
-            this.filter = true;
-            this.infinite = undefined;
-            this.offset = new BehaviorSubject(null);
-            const batchMap = this.offset.pipe(
-              throttleTime(500),
-              mergeMap(n => this.getFilterBatch(n, this.uid, false)),
-              scan((acc, batch) => {
-                return { ...acc, ...batch };
-              }, {})
-            );
-            this.infinite = batchMap.pipe(map(v => Object.values(v)));
-          }
-        }
-      ]
-    });
-    await actionSheet.present();
-  }
-
-  clearFilter() {
-    this.filter = false;
-    this.infinite = undefined;
-    this.offset = new BehaviorSubject(null);
-    this.initialBatch(this.uid);
   }
 
   async logout() {
@@ -292,73 +200,5 @@ export class TodoPage implements OnDestroy {
       position: 'bottom'
     });
     toast.present();
-  }
-
-  loadData(event: { target: { complete: () => void } }) {
-    this.page.more();
-    if (this.page.done) {
-      event.target.complete();
-    }
-  }
-
-  getBatch(offset: any, userid: string) {
-    return this.afs
-      .collection(`users/${userid}/todos`, ref =>
-        ref
-          .orderBy('title')
-          .startAfter(offset)
-          .limit(this.batch)
-      )
-      .snapshotChanges()
-      .pipe(
-        tap(arr => (arr.length ? null : (this.theEnd = true))),
-        map(arr => {
-          return arr.reduce((acc, cur) => {
-            const id = cur.payload.doc.id;
-            const data = cur.payload.doc.data();
-            data['tid'] = id;
-            return { ...acc, [id]: data };
-          }, {});
-        })
-      );
-  }
-
-  getFilterBatch(offset: any, userid: string, todoState: boolean) {
-    return this.afs
-      .collection(`users/${userid}/todos`, ref =>
-        ref
-          .orderBy('title')
-          .startAfter(offset)
-          .limit(this.batch)
-          .where('complete', '==', todoState)
-      )
-      .snapshotChanges()
-      .pipe(
-        tap(arr => (arr.length ? null : (this.theEnd = true))),
-        map(arr => {
-          return arr.reduce((acc, cur) => {
-            const id = cur.payload.doc.id;
-            const data = cur.payload.doc.data();
-            data['tid'] = id;
-            return { ...acc, [id]: data };
-          }, {});
-        })
-      );
-  }
-
-  nextBatch(e: any, offset: any) {
-    if (this.theEnd) {
-      return;
-    }
-
-    const end = this.viewport.getRenderedRange().end;
-    const total = this.viewport.getDataLength();
-    if (end === total) {
-      this.offset.next(offset);
-    }
-  }
-
-  trackByIdx(i: any) {
-    return i;
   }
 }

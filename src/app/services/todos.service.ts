@@ -4,7 +4,7 @@ import {
   AngularFirestoreDocument,
   AngularFirestoreCollection
 } from '@angular/fire/firestore';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 
 interface Todo {
   title: string;

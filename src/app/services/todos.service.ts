@@ -8,7 +8,6 @@ import * as firebase from 'firebase/app';
 
 interface Todo {
   title: string;
-  complete: boolean;
   timestamp: any;
 }
 
@@ -25,7 +24,7 @@ export class TodosService {
   add(userid: string, title: string) {
     const now = firebase.firestore.Timestamp.now();
     this.usercol = this.afs.collection<Todo>(`users/${userid}/todos`);
-    return this.usercol.add({ title: title, complete: false, timestamp: now });
+    return this.usercol.add({ title: title, timestamp: now });
   }
 
   // delete a todo
@@ -38,11 +37,5 @@ export class TodosService {
   update(userid: string, todoid: string, title: string) {
     this.userdoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
     return this.userdoc.update({ title: title });
-  }
-
-  // update the complete state of a todo
-  updatestate(userid: string, todoid: string, state: boolean) {
-    this.userdoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
-    return this.userdoc.update({ complete: state });
   }
 }

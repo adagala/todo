@@ -14,14 +14,8 @@
   <ion-card *ngFor="let todo of todos | async;" (click)="todoActionSheet(todo.tid, todo.title, todo.complete)">
     <ion-card-content>
       <p>
-        <ion-icon [color]="todo.complete ? 'success' : 'primary'" [name]="todo.complete ? 'done-all' : 'refresh'">
-        </ion-icon>
         {{todo.title}}
       </p>
-      <ion-badge [color]="todo.complete ? 'success' : 'primary'">
-        <small *ngIf="!todo.complete">Pending</small>
-        <small *ngIf="todo.complete">Complete</small>
-      </ion-badge>
       <small float-right>12/12/2009</small>
     </ion-card-content>
   </ion-card>

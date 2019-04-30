@@ -34,19 +34,21 @@ export class TodoPage implements OnDestroy {
     public toastController: ToastController
   ) {
     this._us = this.auth.user$.subscribe(user => {
-      this.uid = user.uid;
-      this.todos = this.afs
-        .collection<any>(`users/${user.uid}/todos`, ref => ref.orderBy('timestamp', 'desc'))
-        .snapshotChanges()
-        .pipe(
-          map(actions => {
-            return actions.map(a => {
-              const data = a.payload.doc.data();
-              const tid = a.payload.doc.id;
-              return { tid, ...data };
-            });
-          })
-        );
+      if (user) {
+        this.uid = user.uid;
+        this.todos = this.afs
+          .collection<any>(`users/${user.uid}/todos`, ref => ref.orderBy('timestamp', 'desc'))
+          .snapshotChanges()
+          .pipe(
+            map(actions => {
+              return actions.map(a => {
+                const data = a.payload.doc.data();
+                const tid = a.payload.doc.id;
+                return { tid, ...data };
+              });
+            })
+          );
+      }
     });
   }
 
@@ -54,30 +56,6 @@ export class TodoPage implements OnDestroy {
     if (this._us) {
       this._us.unsubscribe();
     }
-  }
-
-  async todoActionSheet(todoId: string, todoTitle: string) {
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Todo Actions',
-      buttons: [
-        {
-          text: 'Update',
-          icon: 'create',
-          handler: () => {
-            this.todoUpdate(todoId, todoTitle);
-          }
-        },
-        {
-          text: 'Delete',
-          role: 'destructive',
-          icon: 'trash',
-          handler: () => {
-            this.confirmDelete(todoId);
-          }
-        }
-      ]
-    });
-    await actionSheet.present();
   }
 
   async todoUpdate(todoId: string, todoTitle: string) {
@@ -133,35 +111,13 @@ export class TodoPage implements OnDestroy {
           handler: () => { }
         }, {
           text: 'Ok',
-          handler: data => {
+          handler: async data => {
             if (data.todo === undefined || data.todo === '') {
               this.presentToast('Cannot add an Empty Todo');
               return;
             }
-            this.ts.add(this.uid, data.todo);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  async confirmDelete(todoid: string) {
-    const alert = await this.alertController.create({
-      header: 'Confirm!',
-      message: 'Are you sure you want to delete?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary'
-        },
-        {
-          text: 'Delete',
-          handler: async () => {
-            await this.ts.delete(this.uid, todoid);
-            return this.presentToast('Todo Deleted');
+            await this.ts.add(this.uid, data.todo);
+            return this.presentToast('Todo Added');
           }
         }
       ]
@@ -200,5 +156,9 @@ export class TodoPage implements OnDestroy {
       position: 'bottom'
     });
     toast.present();
+  }
+
+  viewTasks(todoid: string) {
+    this.router.navigateByUrl(`todo/${todoid}/tasks`);
   }
 }

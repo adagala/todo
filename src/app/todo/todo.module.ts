@@ -7,11 +7,16 @@ import { IonicModule } from '@ionic/angular';
 
 import { TodoPage } from './todo.page';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { TasksComponent } from './tasks/tasks.component';
 
 const routes: Routes = [
   {
     path: '',
     component: TodoPage
+  },
+  {
+    path: ':todoid/tasks',
+    component:  TasksComponent
   }
 ];
 
@@ -24,6 +29,6 @@ const routes: Routes = [
     ScrollingModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [TodoPage]
+  declarations: [TodoPage, TasksComponent]
 })
 export class TodoPageModule {}

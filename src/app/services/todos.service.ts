@@ -9,6 +9,7 @@ import * as firebase from 'firebase/app';
 interface Todo {
   title: string;
   timestamp: any;
+  taskcount: number;
 }
 
 @Injectable({
@@ -24,7 +25,7 @@ export class TodosService {
   add(userid: string, title: string) {
     const now = firebase.firestore.Timestamp.now();
     this.usercol = this.afs.collection<Todo>(`users/${userid}/todos`);
-    return this.usercol.add({ title: title, timestamp: now });
+    return this.usercol.add({ title: title, timestamp: now, taskcount: 0 });
   }
 
   // delete a todo

@@ -71,4 +71,36 @@ export class TasksComponent {
     toast.present();
   }
 
+  async addTask() {
+    const alert = await this.alertController.create({
+      header: 'New Task',
+      inputs: [
+        {
+          name: 'task',
+          type: 'text',
+          placeholder: 'Task'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => { }
+        }, {
+          text: 'ADD',
+          handler: async data => {
+            if (data.task === undefined || data.task === '') {
+              this.presentToast('Cannot add an Empty Task');
+              return;
+            }
+            await this.ts.addTask(this.uid, this.todoid, data.task);
+            return this.presentToast('Task Added');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
 }

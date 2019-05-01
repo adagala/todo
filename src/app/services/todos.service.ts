@@ -9,34 +9,43 @@ import * as firebase from 'firebase/app';
 interface Todo {
   title: string;
   timestamp: any;
-  taskcount: number;
+  taskcount: any;
+  tasks?: any;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodosService {
-  userdoc: AngularFirestoreDocument<Todo>;
-  usercol: AngularFirestoreCollection<Todo>;
+  tododoc: AngularFirestoreDocument<Todo>;
+  todocol: AngularFirestoreCollection<Todo>;
 
   constructor(private afs: AngularFirestore) { }
 
   // add a new todo
   add(userid: string, title: string) {
     const now = firebase.firestore.Timestamp.now();
-    this.usercol = this.afs.collection<Todo>(`users/${userid}/todos`);
-    return this.usercol.add({ title: title, timestamp: now, taskcount: 0 });
+    this.todocol = this.afs.collection<Todo>(`users/${userid}/todos`);
+    return this.todocol.add({ title: title, timestamp: now, taskcount: 0 });
   }
 
   // delete a todo
   delete(userid: string, todoid: string) {
-    this.userdoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
-    return this.userdoc.delete();
+    this.tododoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
+    return this.tododoc.delete();
   }
 
   // update title of a todo
   update(userid: string, todoid: string, title: string) {
-    this.userdoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
-    return this.userdoc.update({ title: title });
+    this.tododoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
+    return this.tododoc.update({ title: title });
+  }
+
+  // add a task for a todo
+  addTask(userid: string, todoid: string, taskname: string) {
+    const taskCount = firebase.firestore.FieldValue.increment(1);
+    const task = firebase.firestore.FieldValue.arrayUnion({ name: taskname, complete: false });
+    this.tododoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
+    return this.tododoc.update({ taskcount: taskCount, 'tasks': task });
   }
 }

@@ -4,7 +4,10 @@
       <ion-back-button defaultHref="todo"></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button size="small" slot="icon-only" (click)="confirmDelete()">
+      <ion-button size="large" slot="icon-only" (click)="addTask()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+      <ion-button size="large" slot="icon-only" (click)="confirmDelete()">
         <ion-icon name="trash"></ion-icon>
       </ion-button>
     </ion-buttons>

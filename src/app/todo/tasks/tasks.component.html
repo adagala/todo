@@ -18,7 +18,7 @@
 
   <ion-list>
     <ion-item lines="none">
-      <ion-input class="todo-title" [value]="(todo | async)?.title"></ion-input>
+      <ion-input debounce="1000" (ionChange)="updateTitle($event)" class="todo-title" [value]="(todo | async)?.title"></ion-input>
     </ion-item>
     <ion-list-header>
       <ion-label>

@@ -103,4 +103,11 @@ export class TasksComponent {
 
     await alert.present();
   }
+
+  updateTitle(e: any) {
+    if (e.detail.value === undefined || e.detail.value === '') {
+      return;
+    }
+    return this.ts.update(this.uid, this.todoid, e.detail.value);
+  }
 }

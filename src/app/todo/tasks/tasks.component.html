@@ -25,7 +25,7 @@
         {{ (todo | async)?.taskcount }} Task<span *ngIf="(todo | async)?.taskcount !== 1">s</span>
       </ion-label>
     </ion-list-header>
-    <ion-item lines="none" *ngFor="let task of (todo | async)?.tasks">
+    <ion-item lines="none" *ngFor="let task of (todo | async)?.array_tasks">
       <ion-checkbox [ngClass]="task.complete ? 'completed-todo' : ''" [checked]="task.complete" slot="start">
       </ion-checkbox>
       <ion-input [ngClass]="task.complete ? 'completed-todo' : ''" [value]="task.name" clear-input="true"></ion-input>

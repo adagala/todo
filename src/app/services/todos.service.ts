@@ -7,10 +7,11 @@ import {
 import * as firebase from 'firebase/app';
 
 interface Todo {
-  title: string;
-  timestamp: any;
+  title?: string;
+  timestamp?: any;
   taskcount: any;
   tasks?: any;
+  taskid?: string;
 }
 
 @Injectable({
@@ -44,8 +45,20 @@ export class TodosService {
   // add a task for a todo
   addTask(userid: string, todoid: string, taskname: string) {
     const taskCount = firebase.firestore.FieldValue.increment(1);
-    const task = firebase.firestore.FieldValue.arrayUnion({ name: taskname, complete: false });
+    const taskid = this.afs.createId();
     this.tododoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
-    return this.tododoc.update({ taskcount: taskCount, 'tasks': task });
+    return this.tododoc.set(
+      {
+        taskcount: taskCount,
+        'tasks': {
+          [`${taskid}`]: {
+            name: taskname,
+            complete: false,
+            taskid: `${taskid}`
+          }
+        }
+      },
+      { merge: true }
+    );
   }
 }

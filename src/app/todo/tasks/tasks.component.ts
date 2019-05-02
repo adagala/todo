@@ -5,6 +5,7 @@ import { Subscription, Observable } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-tasks',
@@ -33,7 +34,15 @@ export class TasksComponent {
       if (user) {
         this.uid = user.uid;
         this.todoDoc = this.afs.doc<any>(`users/${user.uid}/todos/${this.todoid}`);
-        this.todo = this.todoDoc.valueChanges();
+        this.todo = this.todoDoc.snapshotChanges()
+        .pipe(
+          map(val => {
+            const todo = val.payload.data();
+            const tasks = val.payload.data().tasks;
+            const array_tasks = Object.values(tasks);
+            return { array_tasks, ...todo };
+          })
+        );
       }
     });
   }

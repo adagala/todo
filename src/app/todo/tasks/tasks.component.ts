@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
 import { TodosService } from 'src/app/services/todos.service';
 import { Subscription, Observable } from 'rxjs';
@@ -12,10 +12,10 @@ import { map } from 'rxjs/operators';
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss']
 })
-export class TasksComponent {
+export class TasksComponent implements OnDestroy {
 
   uid: string;
-  _us: Subscription;
+  _task: Subscription;
   todoid: string;
   private todoDoc: AngularFirestoreDocument<any>;
   todo: Observable<any>;
@@ -30,7 +30,7 @@ export class TasksComponent {
     private afs: AngularFirestore
   ) {
     this.todoid = this.activatedroute.snapshot.paramMap.get('todoid');
-    this._us = this.auth.user$.subscribe(user => {
+    this._task = this.auth.user$.subscribe(user => {
       if (user) {
         this.uid = user.uid;
         this.todoDoc = this.afs.doc<any>(`users/${user.uid}/todos/${this.todoid}`);
@@ -45,6 +45,10 @@ export class TasksComponent {
           );
       }
     });
+  }
+
+  ngOnDestroy() {
+    this._task.unsubscribe();
   }
 
   async confirmDelete() {

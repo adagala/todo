@@ -53,9 +53,7 @@ export class TodoPage implements OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this._us) {
-      this._us.unsubscribe();
-    }
+    this._us.unsubscribe();
   }
 
   async todoUpdate(todoId: string, todoTitle: string) {
@@ -139,8 +137,8 @@ export class TodoPage implements OnDestroy {
         {
           text: 'Logout',
           handler: async () => {
-            await this.auth.signOut();
-            return this.router.navigateByUrl('login');
+            await this.router.navigateByUrl('login');
+            return this.auth.signOut();
           }
         }
       ]

@@ -9,7 +9,7 @@ import * as firebase from 'firebase/app';
 interface Todo {
   title?: string;
   timestamp?: any;
-  taskcount: any;
+  taskcount?: any;
   tasks?: any;
   taskid?: string;
 }
@@ -60,5 +60,11 @@ export class TodosService {
       },
       { merge: true }
     );
+  }
+
+  // update task state
+  updateTaskState(userid: string, todoid: string, taskid: string, taskstate: boolean) {
+    this.tododoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
+    return this.tododoc.set({ 'tasks': { [`${taskid}`]: { complete: taskstate } } }, { merge: true });
   }
 }

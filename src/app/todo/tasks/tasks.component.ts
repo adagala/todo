@@ -38,7 +38,7 @@ export class TasksComponent {
         .pipe(
           map(val => {
             const todo = val.payload.data();
-            const tasks = val.payload.data().tasks;
+            const tasks = val.payload.data().tasks || {};
             const array_tasks = Object.values(tasks);
             return { array_tasks, ...todo };
           })
@@ -118,5 +118,9 @@ export class TasksComponent {
       return;
     }
     return this.ts.update(this.uid, this.todoid, e.detail.value);
+  }
+
+  updateTaskState(e: any, taskid: string) {
+    return this.ts.updateTaskState(this.uid, this.todoid, taskid, e.detail.checked);
   }
 }

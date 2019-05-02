@@ -67,4 +67,10 @@ export class TodosService {
     this.tododoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
     return this.tododoc.set({ 'tasks': { [`${taskid}`]: { complete: taskstate } } }, { merge: true });
   }
+
+  // update task name
+  updateTaskName(userid: string, todoid: string, taskid: string, taskname: string) {
+    this.tododoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
+    return this.tododoc.set({ 'tasks': { [`${taskid}`]: { name: taskname } } }, { merge: true });
+  }
 }

@@ -123,4 +123,8 @@ export class TasksComponent {
   updateTaskState(e: any, taskid: string) {
     return this.ts.updateTaskState(this.uid, this.todoid, taskid, e.detail.checked);
   }
+
+  updateTaskName(e: any, taskid: string) {
+    return this.ts.updateTaskName(this.uid, this.todoid, taskid, e.detail.value);
+  }
 }

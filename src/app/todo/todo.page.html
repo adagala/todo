@@ -11,14 +11,11 @@
 
 <ion-content>
 
-  <ion-card *ngFor="let todo of todos | async;" (click)="viewTasks(todo.tid)">
-    <ion-card-content>
-      <p>
-        {{todo.title}}
-      </p>
-      <small float-right>12/12/2009</small>
-    </ion-card-content>
-  </ion-card>
+  <ion-list lines="full">
+    <ion-item *ngFor="let todo of todos | async;" (click)="viewTasks(todo.tid)">
+      {{ todo.title }}
+    </ion-item>
+  </ion-list>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button color="tertiary" size="small" (click)="todoAdd()">

@@ -73,4 +73,11 @@ export class TodosService {
     this.tododoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
     return this.tododoc.set({ 'tasks': { [`${taskid}`]: { name: taskname } } }, { merge: true });
   }
+
+  // delete task
+  deleteTask(userid: string, todoid: string, taskid: string) {
+    const taskCount = firebase.firestore.FieldValue.increment(-1);
+    this.tododoc = this.afs.doc(`users/${userid}/todos/${todoid}`);
+    return this.tododoc.update({ taskcount: taskCount, [`tasks.${taskid}`]: firebase.firestore.FieldValue.delete() });
+  }
 }

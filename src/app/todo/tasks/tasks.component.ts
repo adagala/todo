@@ -35,14 +35,14 @@ export class TasksComponent {
         this.uid = user.uid;
         this.todoDoc = this.afs.doc<any>(`users/${user.uid}/todos/${this.todoid}`);
         this.todo = this.todoDoc.snapshotChanges()
-        .pipe(
-          map(val => {
-            const todo = val.payload.data();
-            const tasks = val.payload.data().tasks || {};
-            const array_tasks = Object.values(tasks);
-            return { array_tasks, ...todo };
-          })
-        );
+          .pipe(
+            map(val => {
+              const todo = val.payload.data();
+              const tasks = val.payload.data().tasks || {};
+              const array_tasks = Object.values(tasks);
+              return { array_tasks, ...todo };
+            })
+          );
       }
     });
   }
@@ -125,6 +125,14 @@ export class TasksComponent {
   }
 
   updateTaskName(e: any, taskid: string) {
-    return this.ts.updateTaskName(this.uid, this.todoid, taskid, e.detail.value);
+    const taskname = e.detail.value;
+    if (taskname === '' || taskname === undefined) {
+      return this.deleteTask(taskid);
+    }
+    return this.ts.updateTaskName(this.uid, this.todoid, taskid, taskname);
+  }
+
+  deleteTask(taskid: string) {
+    return this.ts.deleteTask(this.uid, this.todoid, taskid);
   }
 }

@@ -9,6 +9,8 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { FirebaseModule } from './../firebase';
 import { AuthGuard } from './services/auth.guard';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent],
@@ -17,7 +19,8 @@ import { AuthGuard } from './services/auth.guard';
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
-    FirebaseModule
+    FirebaseModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

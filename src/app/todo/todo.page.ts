@@ -93,7 +93,7 @@ export class TodoPage implements OnDestroy {
 
   async todoAdd() {
     const alert = await this.alertController.create({
-      header: 'Add Todo',
+      header: 'New Todo',
       inputs: [
         {
           name: 'todo',
@@ -108,7 +108,7 @@ export class TodoPage implements OnDestroy {
           cssClass: 'secondary',
           handler: () => { }
         }, {
-          text: 'Ok',
+          text: 'Add',
           handler: async data => {
             if (data.todo === undefined || data.todo === '') {
               this.presentToast('Cannot add an Empty Todo');

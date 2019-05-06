@@ -1,8 +1,20 @@
 <ion-header>
   <ion-toolbar color="tertiary">
-    <ion-title>Todo List</ion-title>
+    <ion-buttons slot="start">
+      <ion-button *ngIf="selection" size="small" slot="icon-only" (click)="unSelect()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title *ngIf="selection">{{ todosSelected.length }}</ion-title>
+    <ion-title *ngIf="!selection">Todo List</ion-title>
     <ion-buttons slot="end" *ngIf="auth.user$ | async as user">
-      <ion-button size="small" slot="icon-only" (click)="logout()">
+      <ion-button *ngIf="selection" size="small" slot="icon-only">
+        <ion-icon name="archive"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="selection" size="small" slot="icon-only" (click)="confirmDelete()">
+        <ion-icon name="trash"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="!selection" size="small" slot="icon-only" (click)="logout()">
         <ion-icon name="log-out"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -13,8 +25,10 @@
 
   <ion-list lines="full">
     <div *ngIf="todos | async; let todos_ else loading">
-      <ion-item *ngFor="let todo of todos_;" (click)="viewTasks(todo.tid)">
+      <ion-item *ngFor="let todo of todos_;" (tap)="viewTasks(todo.tid)" (press)="press(todo)"
+        [color]="todo.isSelected ? 'medium' : ''">
         {{ todo.title }}
+          <ion-icon *ngIf="todo.isSelected" size="small" slot="end" name="checkmark"></ion-icon>
       </ion-item>
     </div>
     <ng-template #loading>

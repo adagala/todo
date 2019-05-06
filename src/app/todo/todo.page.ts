@@ -23,6 +23,9 @@ export class TodoPage implements OnDestroy {
   uid: string;
   todos: Observable<any>;
 
+  selection = false;
+  todosSelected: Array<any> = new Array<any>();
+
   constructor(
     private afs: AngularFirestore,
     public actionSheetCtrl: ActionSheetController,
@@ -44,7 +47,8 @@ export class TodoPage implements OnDestroy {
               return actions.map(a => {
                 const data = a.payload.doc.data();
                 const tid = a.payload.doc.id;
-                return { tid, ...data };
+                const isSelected = false;
+                return { tid, isSelected, ...data };
               });
             })
           );
@@ -158,5 +162,63 @@ export class TodoPage implements OnDestroy {
 
   viewTasks(todoid: string) {
     this.router.navigateByUrl(`todo/${todoid}/tasks`);
+  }
+
+  press(todo: any) {
+    if (todo.isSelected) {
+      for (let i = 0; i < this.todosSelected.length; i++) {
+        if (this.todosSelected[i].tid === todo.tid) {
+          this.todosSelected.splice(i, 1);
+        }
+      }
+      todo.isSelected = false;
+      this.selection = this.todosSelected.length < 1 ? false : true;
+    } else {
+      this.todosSelected.push(todo);
+      todo.isSelected = true;
+      this.selection = true;
+    }
+  }
+
+  unSelect() {
+    this.selection = false;
+    this.todosSelected.forEach(todo => {
+      todo.isSelected = false;
+    });
+    this.todosSelected.length = 0;
+  }
+
+  async deleteTodos() {
+    this.selection = false;
+    await this.todosSelected.forEach(todo => {
+      todo.isSelected = false;
+      this.ts.delete(this.uid, todo.tid);
+    });
+    this.todosSelected.length = 0;
+    return this.presentToast('Todos Deleted');
+  }
+
+  async confirmDelete() {
+    const msg = this.todosSelected.length === 1 ?
+      'Delete this conversation?' :
+      `Delete these ${this.todosSelected.length} conversations?`;
+    const alert = await this.alertController.create({
+      message: msg,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Delete',
+          handler: async () => {
+            this.deleteTodos();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }

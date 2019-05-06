@@ -12,9 +12,28 @@
 <ion-content>
 
   <ion-list lines="full">
-    <ion-item *ngFor="let todo of todos | async;" (click)="viewTasks(todo.tid)">
-      {{ todo.title }}
-    </ion-item>
+    <div *ngIf="todos | async; let todos_ else loading">
+      <ion-item *ngFor="let todo of todos_;" (click)="viewTasks(todo.tid)">
+        {{ todo.title }}
+      </ion-item>
+    </div>
+    <ng-template #loading>
+      <ion-item>
+        <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
+      </ion-item>
+      <ion-item>
+        <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
+      </ion-item>
+      <ion-item>
+        <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
+      </ion-item>
+      <ion-item>
+        <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
+      </ion-item>
+      <ion-item>
+        <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
+      </ion-item>
+    </ng-template>
   </ion-list>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

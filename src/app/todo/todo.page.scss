@@ -1,3 +1,11 @@
 cdk-virtual-scroll-viewport {
   height: 100vh;
 }
+
+.custom-grid {
+  --ion-grid-width: 540px;
+}
+
+.cursor {
+  cursor: pointer;
+}

@@ -7,3 +7,11 @@
     text-decoration: line-through;
     opacity: .5;
 }
+
+.custom-grid {
+    --ion-grid-width: 540px;
+}
+
+.cursor {
+    cursor: pointer;
+}

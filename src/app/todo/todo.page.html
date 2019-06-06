@@ -20,32 +20,38 @@
 
 <ion-content>
 
-  <ion-list lines="full">
-    <div *ngIf="todos | async; let todos_ else loading">
-      <ion-item *ngFor="let todo of todos_;" (tap)="viewTasks(todo.tid)" (press)="press(todo)"
-        [color]="todo.isSelected ? 'medium' : ''">
-        {{ todo.title }}
-        <ion-icon *ngIf="todo.isSelected" size="small" slot="end" name="checkmark"></ion-icon>
-      </ion-item>
-    </div>
-    <ng-template #loading>
-      <ion-item>
-        <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
-      </ion-item>
-      <ion-item>
-        <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
-      </ion-item>
-      <ion-item>
-        <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
-      </ion-item>
-      <ion-item>
-        <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
-      </ion-item>
-      <ion-item>
-        <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
-      </ion-item>
-    </ng-template>
-  </ion-list>
+  <ion-grid class="custom-grid" fixed>
+    <ion-row>
+      <ion-col>
+        <ion-list lines="full">
+          <div *ngIf="todos | async; let todos_ else loading">
+            <ion-item *ngFor="let todo of todos_;" (tap)="viewTasks(todo.tid)" (press)="press(todo)"
+              [color]="todo.isSelected ? 'medium' : ''" class="cursor">
+              {{ todo.title }}
+              <ion-icon *ngIf="todo.isSelected" size="small" slot="end" name="checkmark"></ion-icon>
+            </ion-item>
+          </div>
+          <ng-template #loading>
+            <ion-item>
+              <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
+            </ion-item>
+            <ion-item>
+              <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
+            </ion-item>
+            <ion-item>
+              <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
+            </ion-item>
+            <ion-item>
+              <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
+            </ion-item>
+            <ion-item>
+              <ion-skeleton-text animated style="width: 80%; height: 40%;"></ion-skeleton-text>
+            </ion-item>
+          </ng-template>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button color="tertiary" size="small" (click)="todoAdd()">

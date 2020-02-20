@@ -14,12 +14,12 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "~9.0.2",
-    "@angular/cdk": "~8.2.3",
+    "@angular/cdk": "~9.0.1",
     "@angular/common": "~9.0.2",
     "@angular/core": "~9.0.2",
     "@angular/fire": "^5.2.1",
     "@angular/forms": "~9.0.2",
-    "@angular/material": "^8.2.3",
+    "@angular/material": "^9.0.1",
     "@angular/platform-browser": "~9.0.2",
     "@angular/platform-browser-dynamic": "~9.0.2",
     "@angular/router": "~9.0.2",
@@ -36,7 +36,7 @@
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
-    "@angular-devkit/architect": "~0.13.8",
+    "@angular-devkit/architect": "^0.801.2",
     "@angular-devkit/build-angular": "~0.900.3",
     "@angular-devkit/core": "^9.0.3",
     "@angular-devkit/schematics": "^9.0.3",

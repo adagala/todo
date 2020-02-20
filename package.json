@@ -19,7 +19,6 @@
     "@angular/core": "~8.2.14",
     "@angular/fire": "^5.2.1",
     "@angular/forms": "~8.2.14",
-    "@angular/http": "~7.2.14",
     "@angular/material": "^8.2.3",
     "@angular/platform-browser": "~8.2.14",
     "@angular/platform-browser-dynamic": "~8.2.14",
@@ -39,8 +38,8 @@
   "devDependencies": {
     "@angular-devkit/architect": "~0.13.8",
     "@angular-devkit/build-angular": "^0.803.25",
-    "@angular-devkit/core": "~7.3.8",
-    "@angular-devkit/schematics": "~7.3.8",
+    "@angular-devkit/core": "^8.3.25",
+    "@angular-devkit/schematics": "^8.3.25",
     "@angular/cli": "~8.3.25",
     "@angular/compiler": "~8.2.14",
     "@angular/compiler-cli": "^8.2.14",

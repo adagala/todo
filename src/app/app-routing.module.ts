@@ -4,10 +4,15 @@ import { AuthGuard } from './services/auth.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'todo', pathMatch: 'full' },
-  { path: 'login', loadChildren: './login/login.module#LoginPageModule' },
+  {
+    path: 'login',
+    loadChildren: () => import('./login/login.module')
+      .then(m => m.LoginPageModule)
+  },
   {
     path: 'todo',
-    loadChildren: './todo/todo.module#TodoPageModule',
+    loadChildren: () => import('./todo/todo.module')
+      .then(m => m.TodoPageModule),
     canActivate: [AuthGuard]
   },
   { path: '**', redirectTo: 'todo', pathMatch: 'full' }
@@ -17,4 +22,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
